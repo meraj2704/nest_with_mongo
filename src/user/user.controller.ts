@@ -20,8 +20,8 @@ export class UserController {
     description: 'User created successfully',
   })
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const { name, age } = createUserDto;
-    return this.userService.create(name, age);
+    // const { name, email, age } = createUserDto;
+    return this.userService.create(createUserDto);
   }
 
   @Get()
