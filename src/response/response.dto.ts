@@ -1,8 +1,8 @@
-export class ApoResponse<T> {
+export class CustomApiResponse<T> {
   statusCode: number;
   message: string;
   data: T | null;
-  error: string | null;
+  error?: string | null;
 
   constructor(
     statusCode: number,
@@ -13,6 +13,6 @@ export class ApoResponse<T> {
     this.statusCode = statusCode;
     this.message = message;
     this.data = data;
-    this.error = error;
+    if (error) this.error = error;
   }
 }

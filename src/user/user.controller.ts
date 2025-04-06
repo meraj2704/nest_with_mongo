@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './user.schema';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './user.dto';
+import { CustomApiResponse } from 'src/response/response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -19,9 +19,26 @@ export class UserController {
     status: 201,
     description: 'User created successfully',
   })
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    // const { name, email, age } = createUserDto;
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const { email } = createUserDto;
+      const existingUser = await this.userService.findOneByEmail(email);
+      if (existingUser) {
+        return new CustomApiResponse(
+          400,
+          'User with this email already exists',
+        );
+      }
+      const user = await this.userService.create(createUserDto);
+      return new CustomApiResponse(201, 'User created successfully', user);
+    } catch (error) {
+      return new CustomApiResponse(
+        500,
+        'Failed to create user',
+        null,
+        error.message,
+      );
+    }
   }
 
   @Get()
@@ -31,7 +48,17 @@ export class UserController {
     description: 'List of users',
     type: [CreateUserDto],
   })
-  async findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  async findAll() {
+    try {
+      const users = await this.userService.findAll();
+      return new CustomApiResponse(200, 'Users fetched successfully', users);
+    } catch (error) {
+      return new CustomApiResponse(
+        500,
+        'Failed to fetch users',
+        null,
+        error.message,
+      );
+    }
   }
 }

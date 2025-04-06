@@ -19,11 +19,15 @@ export class UserService {
       password: hashedPassword,
       role: 'user',
     });
-    return newUser.save();
+    const createdUser = await newUser.save();
+    return this.userModel
+      .findById(createdUser._id)
+      .select('_id name email age role')
+      .exec();
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userModel.find().select('_id name email age role').exec();
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
