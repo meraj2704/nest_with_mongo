@@ -7,7 +7,11 @@ export const userSchema = new Schema(
     age: { type: Number, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    role: {
+      type: String,
+      enum: ['admin', 'user', 'guest', 'moderator', 'super_admin'],
+      default: 'user',
+    },
   },
   { timestamps: true },
 );

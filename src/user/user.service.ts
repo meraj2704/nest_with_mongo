@@ -33,4 +33,36 @@ export class UserService {
   async findOneByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email }).exec();
   }
+
+  async findOneById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).exec();
+  }
+  async update(
+    id: string,
+    updateUserDto: Partial<CreateUserDto>,
+  ): Promise<User> {
+    const { name, age, email, password } = updateUserDto;
+    const hashedPassword = password
+      ? await bcrypt.hash(password, 10)
+      : undefined;
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        name,
+        age,
+        email,
+        password: hashedPassword,
+      },
+      { new: true },
+    );
+
+    return updatedUser;
+  }
+  async delete(id: string): Promise<User> {
+    return this.userModel.findByIdAndDelete(id).exec();
+  }
+  async updateUserRole(id: string, role: string): Promise<User> {
+    return this.userModel.findByIdAndUpdate(id, { role }, { new: true }).exec();
+  }
 }

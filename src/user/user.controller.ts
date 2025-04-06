@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from './user.dto';
+import { CreateUserDto, UpdateUserRoleDto } from './user.dto';
 import { CustomApiResponse } from 'src/response/response.dto';
+import { Roles } from 'src/common/guards/roles.decorate';
+import { UserRole } from './user-role.enum';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -56,6 +67,42 @@ export class UserController {
       return new CustomApiResponse(
         500,
         'Failed to fetch users',
+        null,
+        error.message,
+      );
+    }
+  }
+
+  @Put('role/:userId')
+  @ApiOperation({ summary: 'Update user role' })
+  @ApiBody({
+    type: UpdateUserRoleDto,
+    description: 'New role for the user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User role updated successfully',
+  })
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  async updateRole(
+    @Param('userId') userId: string,
+    @Body('role') newRole: string,
+  ) {
+    try {
+      const updatedUser = await this.userService.updateUserRole(
+        userId,
+        newRole,
+      );
+      return new CustomApiResponse(
+        200,
+        'User role updated successfully',
+        updatedUser,
+      );
+    } catch (error) {
+      return new CustomApiResponse(
+        500,
+        'Failed to update user role',
         null,
         error.message,
       );
