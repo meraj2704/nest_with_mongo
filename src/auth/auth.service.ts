@@ -40,7 +40,15 @@ export class AuthService {
     }
     const payload = { email: user.email, sub: user._id };
     console.log('payload from auth service', payload);
-    const signInData = this.jwtService.sign(payload);
+    const access_token = this.jwtService.sign(payload, { expiresIn: '2m' });
+    const refresh_token = this.jwtService.sign(payload, { expiresIn: '1m' });
+
+    const updatedUser = await this.userService.findByIdAndUpdateRefreshToken(
+      user._id as string,
+      refresh_token,
+    );
+
+    console.log('updated user', updatedUser);
 
     const userData = {
       _id: user._id as string,
@@ -48,9 +56,34 @@ export class AuthService {
       email: user.email,
       age: user.age,
       role: user.role,
-      token: signInData,
+      access_token: access_token,
+      refresh_token: refresh_token,
     };
-    console.log('signin data', signInData);
+    console.log('signin data', access_token);
     return userData;
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const decoded = this.jwtService.verify(refreshToken);
+
+      console.log('decoded', decoded);
+
+      const user = await this.userService.findOneByEmail(decoded.email);
+
+      console.log('user', user);
+      if (!user || user.refreshToken !== refreshToken) {
+        throw new HttpException(
+          'Invalid refresh token',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      const payload = { email: user.email, sub: user._id };
+      const newAccessToken = this.jwtService.sign(payload, { expiresIn: '2m' });
+      return newAccessToken;
+    } catch (err) {
+      console.log('Error in refreshAccessToken', err);
+      throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
+    }
   }
 }

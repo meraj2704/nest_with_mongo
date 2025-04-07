@@ -12,6 +12,7 @@ export const userSchema = new Schema(
       enum: ['admin', 'user', 'guest', 'moderator', 'super_admin'],
       default: 'user',
     },
+    refreshToken: { type: String, default: null },
   },
   { timestamps: true },
 );
@@ -24,4 +25,5 @@ export interface User extends Document {
   email: string;
   password: string;
   role: string;
+  refreshToken: string;
 }

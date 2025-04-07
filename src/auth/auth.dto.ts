@@ -4,14 +4,14 @@ import { IsEmail, IsString } from 'class-validator';
 export class AuthDto {
   @ApiProperty({
     description: 'Email of the user',
-    example: 'example@gmail.com',
+    example: 't@gmail.com',
   })
   @IsEmail()
   email: string;
 
   @ApiProperty({
     description: 'Password of the user',
-    example: 'password123',
+    example: '123456',
   })
   @IsString()
   password: string;
@@ -44,8 +44,22 @@ export class LoginResponseDto {
   })
   role: string;
   @ApiProperty({
-    description: 'JWT token for authentication',
+    description: 'JWT access token for authentication',
     example: 'your-jwt-token',
   })
-  token: string;
+  access_token: string;
+  @ApiProperty({
+    description: 'JWT refresh token for authentication',
+    example: 'your-jwt-token',
+  })
+  refresh_token: string;
+}
+
+export class RefreshTokenDto {
+  @ApiProperty({
+    description: 'Refresh token',
+    example: 'your-refresh-token',
+  })
+  @IsString()
+  refresh_token: string;
 }

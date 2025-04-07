@@ -10,8 +10,8 @@ import { AuthModule } from './auth/auth.module';
     MongooseModule.forRoot(
       `mongodb+srv://atimeraj204:cOTajwDT4BfVs90L@cluster0.ztoo9j5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`,
     ),
-    UserModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

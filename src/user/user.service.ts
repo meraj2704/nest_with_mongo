@@ -65,4 +65,15 @@ export class UserService {
   async updateUserRole(id: string, role: string): Promise<User> {
     return this.userModel.findByIdAndUpdate(id, { role }, { new: true }).exec();
   }
+
+  async findByIdAndUpdateRefreshToken(
+    id: string,
+    refreshToken: string,
+  ): Promise<User> {
+    return this.userModel.findByIdAndUpdate(
+      id,
+      { refreshToken },
+      { new: true },
+    );
+  }
 }
