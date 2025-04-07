@@ -30,7 +30,8 @@ export class AuthController {
   })
   async login(@Body() authDto: AuthDto) {
     const { email, password } = authDto; // Destructure email and password from the DTO
-    const user = this.authService.login(email, password);
+    const user = await this.authService.login(email, password);
+    console.log('user ', user);
     return new CustomApiResponse(200, 'Login successful', user); // Return a custom API response
   }
 }
