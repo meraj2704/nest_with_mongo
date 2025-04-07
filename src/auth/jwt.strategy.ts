@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { CustomApiResponse } from 'src/response/response.dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -19,6 +20,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const { sub, email } = payload;
+
+    console.log('payload', payload);
+    if (!sub || !email) {
+      return new CustomApiResponse(
+        401,
+        'Unauthorized',
+        null,
+        'Invalid token payload',
+      );
+    }
 
     const user = await this.userService.findOneByEmail(email);
     if (!user) {

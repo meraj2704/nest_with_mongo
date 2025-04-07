@@ -1,6 +1,8 @@
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -73,7 +75,7 @@ export class UserController {
     }
   }
 
-  @Put('role/:userId')
+  @Put('role-update/:userId')
   @ApiOperation({ summary: 'Update user role' })
   @ApiBody({
     type: UpdateUserRoleDto,
@@ -84,7 +86,7 @@ export class UserController {
     description: 'User role updated successfully',
   })
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async updateRole(
     @Param('userId') userId: string,
     @Body('role') newRole: string,
@@ -103,6 +105,35 @@ export class UserController {
       return new CustomApiResponse(
         500,
         'Failed to update user role',
+        null,
+        error.message,
+      );
+    }
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  @Roles(UserRole.SUPER_ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async delete(@Param('id') id: string) {
+    try {
+      const deletedUser = await this.userService.delete(id);
+      if (!deletedUser) {
+        return new CustomApiResponse(404, 'User not found');
+      }
+      return new CustomApiResponse(200, 'User deleted successfully');
+    } catch (error) {
+      return new CustomApiResponse(
+        500,
+        'Failed to delete user',
         null,
         error.message,
       );

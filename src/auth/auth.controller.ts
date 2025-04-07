@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from './auth.dto';
+import { CustomApiResponse } from 'src/response/response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,6 +30,7 @@ export class AuthController {
   })
   async login(@Body() authDto: AuthDto) {
     const { email, password } = authDto; // Destructure email and password from the DTO
-    return this.authService.login(email, password); // Call the login method from AuthService
+    const user = this.authService.login(email, password);
+    return new CustomApiResponse(200, 'Login successful', user); // Return a custom API response
   }
 }
