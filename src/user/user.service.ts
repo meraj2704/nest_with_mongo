@@ -41,10 +41,7 @@ export class UserService {
     id: string,
     updateUserDto: Partial<CreateUserDto>,
   ): Promise<User> {
-    const { name, age, email, password } = updateUserDto;
-    const hashedPassword = password
-      ? await bcrypt.hash(password, 10)
-      : undefined;
+    const { name, age, email } = updateUserDto;
 
     const updatedUser = await this.userModel.findByIdAndUpdate(
       id,
@@ -52,7 +49,6 @@ export class UserService {
         name,
         age,
         email,
-        password: hashedPassword,
       },
       { new: true },
     );

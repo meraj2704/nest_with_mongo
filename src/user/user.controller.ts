@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto, UpdateUserRoleDto } from './user.dto';
+import { CreateUserDto, UpdateUserDto, UpdateUserRoleDto } from './user.dto';
 import { CustomApiResponse } from '../response/response.dto';
 import { Roles } from '../common/guards/roles.decorate';
 import { UserRole } from './user-role.enum';
@@ -166,5 +166,28 @@ export class UserController {
         error.message,
       );
     }
+  }
+
+  @Put('update-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ description: 'Update user profile' })
+  @ApiBody({
+    description: 'User data to update',
+    type: UpdateUserDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated successfully',
+  })
+  async updateProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    const userId = req.user.userId;
+    console.log('userId', userId);
+    console.log('update user dto', updateUserDto);
+    const updatedUser = await this.userService.update(userId, updateUserDto);
+    return new CustomApiResponse(
+      200,
+      'User profile updated successfully',
+      updatedUser,
+    );
   }
 }
