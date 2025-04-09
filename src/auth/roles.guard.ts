@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-
+// import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 @Injectable()
 export class RolesGuard extends JwtAuthGuard implements CanActivate {
   constructor(private reflector: Reflector) {
