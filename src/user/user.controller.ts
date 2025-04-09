@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -134,6 +135,33 @@ export class UserController {
       return new CustomApiResponse(
         500,
         'Failed to delete user',
+        null,
+        error.message,
+      );
+    }
+  }
+
+  @Get('profile')
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile fetched successfully',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req) {
+    const userId = req.user.userId;
+    console.log('req', req.user);
+    try {
+      const userProfile = await this.userService.getProfile(userId);
+      return new CustomApiResponse(
+        200,
+        'User profile fetched successfully',
+        userProfile,
+      );
+    } catch (error) {
+      return new CustomApiResponse(
+        500,
+        'Failed to fetch user profile',
         null,
         error.message,
       );

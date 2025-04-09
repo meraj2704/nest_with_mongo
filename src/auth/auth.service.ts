@@ -24,7 +24,6 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    console.log('user', user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -39,28 +38,30 @@ export class AuthService {
       );
     }
     const payload = { email: user.email, sub: user._id };
-    console.log('payload from auth service', payload);
-    const access_token = this.jwtService.sign(payload, { expiresIn: '2m' });
-    const refresh_token = this.jwtService.sign(payload, { expiresIn: '1m' });
+    const access_token = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     const updatedUser = await this.userService.findByIdAndUpdateRefreshToken(
       user._id as string,
       refresh_token,
     );
 
-    console.log('updated user', updatedUser);
+    if (updatedUser) {
+      const userData = {
+        _id: user._id as string,
+        name: user.name,
+        email: user.email,
+        age: user.age,
+        role: user.role,
+        access_token: access_token,
+        refresh_token: refresh_token,
+      };
+      return userData;
+    } else {
+      return null;
+    }
 
-    const userData = {
-      _id: user._id as string,
-      name: user.name,
-      email: user.email,
-      age: user.age,
-      role: user.role,
-      access_token: access_token,
-      refresh_token: refresh_token,
-    };
-    console.log('signin data', access_token);
-    return userData;
+    console.log('updated user', updatedUser);
   }
 
   async refreshAccessToken(refreshToken: string): Promise<string> {
@@ -79,7 +80,7 @@ export class AuthService {
         );
       }
       const payload = { email: user.email, sub: user._id };
-      const newAccessToken = this.jwtService.sign(payload, { expiresIn: '2m' });
+      const newAccessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
       return newAccessToken;
     } catch (err) {
       console.log('Error in refreshAccessToken', err);

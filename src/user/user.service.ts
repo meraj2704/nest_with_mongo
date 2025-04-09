@@ -76,4 +76,11 @@ export class UserService {
       { new: true },
     );
   }
+
+  async getProfile(id: string): Promise<User> {
+    const user = await this.userModel
+      .findById(id)
+      .select('_id name email age role');
+    return user;
+  }
 }
